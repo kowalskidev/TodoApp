@@ -1,2 +1,2 @@
 # TodoApp
-Todo App built using React JS with React Bootstrap with all basic functionalities
+Todo App built using React JS and React Bootstrap with all basic functionalities
