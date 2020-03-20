@@ -1,4 +1,4 @@
-import React, { Component } from "react"
+import React, { Component, useState } from "react"
 import TodoItem from './TodoItem.js'
 import todosData from './todosData.js'
 import Card from 'react-bootstrap/Card'
@@ -7,87 +7,73 @@ import InputGroup from 'react-bootstrap/InputGroup'
 import FormControl from 'react-bootstrap/FormControl'
 import { Form } from 'react-bootstrap';
 
-class TodoList extends Component {
+function TodoList() {
 
-    constructor() {
-        super()
-        this.state = {
-            todos: todosData,
-            value: ''
-        }
+    const [todos, setTodos] = useState(todosData)
+    const [value, setValue] = useState("")
 
-        this.handleChange = this.handleChange.bind(this)
-        this.handleDelete = this.handleDelete.bind(this)
-        this.handleSubmit = this.handleSubmit.bind(this)
-        this.handleInput = this.handleInput.bind(this)
-    }
-
-    handleChange(id) {
-        this.setState(prevState => {
-            const updatedTodo = prevState.todos.map(todo => {
-                if (todo.id === id) {
-                    todo.completed = !todo.completed
-                }
-                return todo
-            })
-            return ({
-                todos: updatedTodo
-            })
+    function handleChange(id) {
+        const updatedTodo = todos.map(todo => {
+            if (todo.id === id) {
+                todo.completed = !todo.completed
+            } 
+            return todo
         })
+    
+        setTodos(updatedTodo)
     }
 
-    handleDelete(item) {
-        this.setState(prevState => {
-            prevState.todos.splice(prevState.todos.indexOf(item), 1)
-            return ({
-                todos: prevState.todos
-            })
-        })
+    function handleDelete(item) {
+        function arrayRemove(arr, value) { 
+            return (arr.filter(function (ele) { 
+                return ele != value; })
+            )} 
+            
+        const deletedTodo = arrayRemove(todos, todos.splice(todos.indexOf(item), 1));
+
+        setTodos(deletedTodo)
     }
 
-    handleInput(event) {
-        this.setState({ value: event.target.value });
+    function handleInput(event) {
+        setValue(event.target.value);
     }
 
-    handleSubmit(event) {
-        this.setState(prevState => {
-            const newTodo = {
-                id: Math.max.apply(Math, prevState.todos.map(todo => todo.id)) + 1,
-                text: this.state.value,
+    function handleSubmit(event) {
+        setTodos([
+            ...todos,
+            {
+                id: Math.max.apply(Math, todos.map(todo => todo.id)) + 1,
+                text: value,
                 completed: false
             }
-            prevState.todos.push(newTodo)
-            return ({
-                todos: prevState.todos
-            })
-        })
+        ])
         event.preventDefault();
     }
 
 
-    render() {
-        const todoItems = this.state.todos.map(item => <TodoItem
+    
+        const todoItems = todos.map(item => <TodoItem
             key={item.id}
             item={item}
-            handleChange={this.handleChange}
-            handleDelete={this.handleDelete}
+            handleChange={handleChange}
+            handleDelete={handleDelete}
         />)
-
 
         const today = new Date();
         const date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
         const time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
         const dateTime = date + ' ' + time;
+
         return (
             <div>
                 <h1 className="title">todos</h1>
                 <div className="todo-list">
-                    <Form onSubmit={this.handleSubmit}>
+                    <Form onSubmit={handleSubmit}>
                         <InputGroup >
                             <FormControl aria-describedby="new todo"
                                 type="text"
-                                value={this.state.value}
-                                onChange={this.handleInput}
+                                value={value}
+                                onChange={handleInput}
                             />
                             <InputGroup.Prepend>
                                 <Button variant="outline-primary" type="submit">New Todo</Button>
@@ -104,7 +90,6 @@ class TodoList extends Component {
                 </div>
             </div>
         );
-    }
 }
 
 export default TodoList
